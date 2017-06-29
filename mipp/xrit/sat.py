@@ -148,10 +148,27 @@ class SatelliteLoader(object):
                                (start_time.strftime(opt['filename']) % val))
         image_files.sort()
 
-        # Check if the files are xrit-compressed, and decompress them
-        # accordingly:
-        decomp_files = decompress(image_files)
-
+        decomp_files=[]
+        xrit_outdir = os.environ.get('XRIT_DECOMPRESS_OUTDIR', None)
+        # Check if the files are xrit-compressed, and decompress them accordingly:
+        for img_file in image_files:
+            if xrit_outdir:
+                outdir = xrit_outdir
+            else:
+                outdir = os.path.dirname(img_file)
+            # Check if name is a compressed file 
+            if img_file[-2:] == "C_":
+                img_basename = os.path.basename(img_file)
+                # if decompressed file exits then take this
+                if os.path.isfile(outdir+'/'+img_basename[:-2]+"__"):
+                    logger.info("File already decompressed %s" % outdir+'/'+img_basename[:-2]+"__")
+                    decomp_files.append(outdir+'/'+img_basename[:-2]+"__")
+                else:
+                    #logger.info("File has to be decompressed %s" % img_file)
+                    decomp_files += decompress([img_file])
+        
+        # decomp_files = decompress(image_files)
+        
         # Epilogue
 
         val["segment"] = "EPI".ljust(9, '_')
@@ -283,7 +300,9 @@ def decompress(infiles, **options):
             decomp_files.append(outfile)
         else:
             decomp_files.append(filename)
-
+        #logger.info("chmod %s" % decomp_files[-1])
+        os.chmod(decomp_files[-1], 0775)  ## FOR PYTHON3: 0o664  # give access read/write access to group members
+            
     return decomp_files
 
 
