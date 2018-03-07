@@ -38,7 +38,7 @@ from mipp.xrit import bin_reader as rbin
 from mipp.xrit import Metadata, _xrit
 
 logger = logging.getLogger(__name__)
-
+#logger.setLevel(40)
 
 __all__ = ['read_metadata']
 

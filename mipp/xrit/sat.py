@@ -18,7 +18,7 @@ from mipp.xrit import _xrit
 from mipp.xrit.loader import ImageLoader
 
 logger = logging.getLogger('mipp')
-
+#logger.setLevel(logging.WARNING)
 
 __all__ = ['load_meteosat07',
            'load_meteosat09',
