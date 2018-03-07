@@ -29,6 +29,8 @@ def decompress(infile, outdir='.'):
     environment variable XRIT_DECOMPRESS_PATH
     """
     from subprocess import Popen, PIPE
+    from os.path import exists
+    
     cmd = os.environ.get('XRIT_DECOMPRESS_PATH', None)
     if not cmd:
         raise IOError("XRIT_DECOMPRESS_PATH is not defined" +
@@ -36,6 +38,10 @@ def decompress(infile, outdir='.'):
 
     infile = os.path.abspath(infile)
     cwd = os.getcwd()
+    if not exists(outdir):
+        print '... create output directory: ' + outdir
+        from os import makedirs
+        makedirs(outdir)
     os.chdir(outdir)
 
     question = ("Did you set the environment variable " +
