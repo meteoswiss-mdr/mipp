@@ -33,7 +33,7 @@ from StringIO import StringIO
 
 import numpy as np
 
-from mipp import CalibrationError
+from mipp import CalibrationError, ReaderError
 from mipp.xrit import bin_reader as rbin
 from mipp.xrit import Metadata, _xrit
 
@@ -854,7 +854,10 @@ def read_metadata(prologue, image_files, epilogue):
     fp = StringIO(epilogue.data)
     ftr = read_epiheader(fp)
 
-    im = _xrit.read_imagedata(image_files[0])
+    try:
+        im = _xrit.read_imagedata(image_files[0])
+    except IndexError:
+        raise ReaderError("No image segments available")
 
     md = Metadata()
     md.calibrate = _Calibrator(
@@ -892,11 +895,7 @@ def read_metadata(prologue, image_files, epilogue):
                    + im.navigation.coff - 1)
         md.loff = im.navigation.loff + \
             segment_size * (im.segment.seg_no - 1) - 1
-
-        if ((im.time_stamp < datetime(2037, 1, 24)
-             and im.platform in ['MSG2', 'MSG3'])
-            or (im.time_stamp < datetime(2037, 1, 17)
-                and im.platform in ['MSG1'])):
+        if (hdr["GeometricProcessing"]["EarthModel"]["TypeOfEarthModel"] < 2):
             md.coff += 1.5
             md.loff += 1.5
 
@@ -913,10 +912,7 @@ def read_metadata(prologue, image_files, epilogue):
         md.loff = im.navigation.loff + \
             segment_size * (im.segment.seg_no - 1) - 1
 
-        if ((im.time_stamp < datetime(2037, 1, 24)
-             and im.platform in ['MSG2', 'MSG3'])
-            or (im.time_stamp < datetime(2037, 1, 17)
-                and im.platform in ['MSG1'])):
+        if (hdr["GeometricProcessing"]["EarthModel"]["TypeOfEarthModel"] < 2):
             md.coff += .5
             md.loff += .5
 
