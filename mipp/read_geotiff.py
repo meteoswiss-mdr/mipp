@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+
 from osgeo import gdal, osr
 import numpy as np
 
@@ -168,9 +171,9 @@ if __name__ == '__main__':
     #np.save('fine_cols.npy', fine_cols)
     #np.save('fine_rows.npy', fine_rows)
     lons, lats = interpolator.interpolate()
-    print 'RESULT :'
-    print lons
-    print lats
+    print('RESULT :')
+    print(lons)
+    print(lats)
     np.save('result_lons.npy', lons)
     np.save('result_lats.npy', lats)
     #print 'DATA'
